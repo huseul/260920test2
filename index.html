@@ -20,11 +20,13 @@
     </div>
 
     <div class="month-select">
+
       <label for="month">실적월</label>
 
       <select id="month">
-        <option>2026년 7월</option>
+        <option value="2026년 7월">2026년 7월</option>
       </select>
+
     </div>
 
   </header>
@@ -41,7 +43,10 @@
     <section class="page-title">
 
       <div>
-        <span class="eyebrow">2026년 7월</span>
+        <span id="monthTitle" class="eyebrow">
+          2026년 7월
+        </span>
+
         <h2>회사별 매출액</h2>
       </div>
 
@@ -60,18 +65,18 @@
     <section class="chart-card">
 
       <div class="chart-header">
+
         <div>
           <h3>매출액</h3>
           <p>회사별 매출액을 비교해보세요.</p>
         </div>
+
       </div>
 
 
-      <!-- 그래프 전체를 가로로 스크롤할 수 있는 영역 -->
       <div class="chart-scroll">
 
-        <div id="salesChart" class="chart">
-        </div>
+        <div id="salesChart" class="chart"></div>
 
       </div>
 
@@ -82,199 +87,131 @@
 
   <script>
 
+
+    /*
+     * Google Apps Script 웹앱 주소
+     */
     const API_URL =
-      "https://script.google.com/macros/s/AKfycbz21PZfzi4wgqOD-rcFI6Gj0bdFgWPOE3JPysFvZG051wpOkbcaWF_b2lx65CrpHZS2PA/exec";
+      "https://script.google.com/macros/s/AKfycbwpXgcyI4FnRwRhrsEfAfjvAbWk4jy3kTl0p0lN6lGjw4nqFcGWdN_TUp_iiW4Fm8PmtQ/exec";
 
 
     /*
-     * 시트의 금액이 '원' 단위라고 가정합니다.
+     * Google Sheet의 금액은 원 단위
      *
      * 100,000,000원 = 1억원
      */
     const WON_PER_EOK = 100000000;
 
 
-    loadData();
-
-
-    async function loadData() {
-
-      const loading = document.getElementById("loading");
-      const error = document.getElementById("error");
-
-      try {
-
-        const response = await fetch(API_URL);
-
-        if (!response.ok) {
-          throw new Error("데이터를 불러오지 못했습니다.");
-        }
-
-        const result = await response.json();
-
-        if (!result.success) {
-          throw new Error(
-            result.message || "데이터를 불러오지 못했습니다."
-          );
-        }
-
-        drawSalesChart(result.data);
-
-        loading.style.display = "none";
-
-      } catch (err) {
-
-        loading.style.display = "none";
-
-        error.textContent =
-          "데이터를 불러오는 중 문제가 발생했습니다. " +
-          err.message;
-
-        error.style.display = "block";
-      }
-    }
-
-
-    function drawSalesChart(data) {
-
-      const chart = document.getElementById("salesChart");
-
-      chart.innerHTML = "";
-
-
-      if (!data || data.length === 0) {
-
-        chart.innerHTML =
-          '<div class="empty-message">저장된 실적이 없습니다.</div>';
-
-        return;
-      }
-
-
-      /*
-       * 원 단위 → 억원 단위로 변환
-       */
-      const convertedData = data.map(item => {
-
-        return {
-          company: item["회사"],
-          value: Number(item["매출액"]) / WON_PER_EOK
-        };
-
-      });
-
-
-      /*
-       * 가장 큰 매출액을 기준으로
-       * 막대 높이를 계산합니다.
-       */
-      const maxValue = Math.max(
-        ...convertedData.map(item => item.value)
-      );
-
-
-      convertedData.forEach(function(item) {
-
-        const height =
-          maxValue > 0
-            ? (item.value / maxValue) * 100
-            : 0;
-
-
-        const barItem =
-          document.createElement("div");
-
-        barItem.className = "bar-item";
-
-
-        barItem.innerHTML = `
-
-          <div class="bar-value">
-            ${formatNumber(item.value)}
-          </div>
-
-          <div
-            class="bar"
-            style="height: ${height}%;">
-          </div>
-
-          <div class="company">
-            ${escapeHtml(item.company)}
-          </div>
-
-        `;
-
-
-        chart.appendChild(barItem);
-
-      });
-
-    }
-
-
-    function formatNumber(value) {
-
-      return value.toLocaleString("ko-KR", {
-        maximumFractionDigits: 1
-      });
-
-    }
-
-
-    function escapeHtml(value) {
-
-      if (value === null || value === undefined) {
-        return "";
-      }
-
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-    }
+    /*
+     * 월 선택
+     */
+    const monthSelect =
+      document.getElementById("month");
 
 
     /*
-     * 나중에 저장 기능에서 사용할 함수
-     * Content-Type은 text/plain입니다.
+     * 월 제목
      */
-    async function saveData(
-      company,
-      sales,
-      operatingProfit,
-      netIncome
-    ) {
-
-      const data = {
-        "회사": company,
-        "매출액": sales,
-        "영업이익": operatingProfit,
-        "당기순이익": netIncome
-      };
+    const monthTitle =
+      document.getElementById("monthTitle");
 
 
-      const response = await fetch(API_URL, {
-
-        method: "POST",
-
-        headers: {
-          "Content-Type": "text/plain"
-        },
-
-        body: JSON.stringify(data)
-
-      });
+    /*
+     * 페이지가 열리면
+     * 기본적으로 2026년 7월 데이터를 가져옵니다.
+     */
+    loadData(monthSelect.value);
 
 
-      return await response.json();
-    }
+    /*
+     * 월을 변경하면
+     * 해당 월의 데이터를 다시 가져옵니다.
+     */
+    monthSelect.addEventListener(
+      "change",
+      function() {
 
-  </script>
+        const selectedMonth =
+          monthSelect.value;
 
-</body>
-</html>
+
+        monthTitle.textContent =
+          selectedMonth;
+
+
+        loadData(selectedMonth);
+
+      }
+    );
+
+
+    /*
+     * Google Sheets에서
+     * 선택한 월의 데이터를 가져옵니다.
+     */
+    async function loadData(month) {
+
+      const loading =
+        document.getElementById("loading");
+
+      const error =
+        document.getElementById("error");
+
+
+      loading.style.display = "block";
+
+      error.style.display = "none";
+
+
+      try {
+
+
+        /*
+         * 월 정보를 URL에 붙입니다.
+         *
+         * 예:
+         * ?month=2026년%207월
+         */
+        const url =
+          API_URL +
+          "?month=" +
+          encodeURIComponent(month);
+
+
+        const response =
+          await fetch(url);
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "데이터를 불러오지 못했습니다."
+          );
+
+        }
+
+
+        const result =
+          await response.json();
+
+
+        if (!result.success) {
+
+          throw new Error(
+            result.message ||
+            "데이터를 불러오지 못했습니다."
+          );
+
+        }
+
+
+        /*
+         * 매출액 그래프를 그립니다.
+         */
+        drawSalesChart(
+          result.data
+        );
+
 ```
 
