@@ -4,117 +4,386 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>연결재무실적 - 이익</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+  <!-- 상단 -->
   <header class="header">
+
     <div>
       <h1>연결재무실적</h1>
       <p>회사별 월간 실적을 한눈에 확인하세요.</p>
     </div>
 
     <div class="month-select">
-      <label for="month">실적월</label>
+
+      <label for="month">
+        실적월
+      </label>
+
       <select id="month">
         <option>2026년 7월</option>
-        <option>2026년 8월</option>
-        <option>2026년 9월</option>
       </select>
+
     </div>
+
   </header>
 
 
+  <!-- 메뉴 -->
   <nav class="nav">
-    <a href="index.html">매출액</a>
-    <a href="profit.html" class="active">이익</a>
+
+    <a href="index.html">
+      매출액
+    </a>
+
+    <a href="profit.html" class="active">
+      이익
+    </a>
+
   </nav>
 
 
+  <!-- 본문 -->
   <main class="container">
 
     <section class="page-title">
+
       <div>
-        <span class="eyebrow">2026년 7월</span>
-        <h2>회사별 이익</h2>
+        <span class="eyebrow">
+          2026년 7월
+        </span>
+
+        <h2>
+          회사별 이익
+        </h2>
       </div>
 
-      <span class="unit">단위 : 억원</span>
+      <span class="unit">
+        단위 : 억원
+      </span>
+
     </section>
 
 
+    <!-- 로딩 -->
+    <div id="loading" class="message">
+      데이터를 불러오는 중입니다...
+    </div>
+
+
+    <!-- 오류 -->
+    <div id="error" class="message error-message">
+    </div>
+
+
+    <!-- 영업이익 -->
     <section class="chart-card">
 
       <div class="chart-header">
+
         <div>
           <h3>영업이익</h3>
           <p>회사별 영업이익을 비교해보세요.</p>
         </div>
+
       </div>
 
 
-      <div class="chart">
-
-        <div class="bar-item">
-          <div class="bar-value">120</div>
-          <div class="bar" style="height: 100%;"></div>
-          <div class="company">A사</div>
-        </div>
-
-        <div class="bar-item">
-          <div class="bar-value">85</div>
-          <div class="bar" style="height: 71%;"></div>
-          <div class="company">B사</div>
-        </div>
-
-        <div class="bar-item">
-          <div class="bar-value">52</div>
-          <div class="bar" style="height: 43%;"></div>
-          <div class="company">C사</div>
-        </div>
-
+      <div id="operatingProfitChart" class="chart">
       </div>
 
     </section>
 
 
+    <!-- 당기순이익 -->
     <section class="chart-card">
 
       <div class="chart-header">
+
         <div>
           <h3>당기순이익</h3>
           <p>회사별 당기순이익을 비교해보세요.</p>
         </div>
+
       </div>
 
 
-      <div class="chart">
-
-        <div class="bar-item">
-          <div class="bar-value">95</div>
-          <div class="bar" style="height: 100%;"></div>
-          <div class="company">A사</div>
-        </div>
-
-        <div class="bar-item">
-          <div class="bar-value">62</div>
-          <div class="bar" style="height: 65%;"></div>
-          <div class="company">B사</div>
-        </div>
-
-        <div class="bar-item">
-          <div class="bar-value">38</div>
-          <div class="bar" style="height: 40%;"></div>
-          <div class="company">C사</div>
-        </div>
-
+      <div id="netIncomeChart" class="chart">
       </div>
 
     </section>
 
   </main>
+
+
+  <script>
+
+    /*
+     * Google Apps Script 웹앱 주소
+     */
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbz21PZfzi4wgqOD-rcFI6Gj0bdFgWPOE3JPysFvZG051wpOkbcaWF_b2lx65CrpHZS2PA/exec";
+
+
+    /*
+     * 페이지가 열리면 데이터를 가져옵니다.
+     */
+    loadData();
+
+
+    async function loadData() {
+
+      const loading = document.getElementById("loading");
+      const error = document.getElementById("error");
+
+      try {
+
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error("데이터를 불러오지 못했습니다.");
+        }
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(
+            result.message || "데이터를 불러오지 못했습니다."
+          );
+        }
+
+
+        /*
+         * 데이터를 가져온 뒤
+         * 두 개의 그래프를 그립니다.
+         */
+        drawProfitChart(
+          result.data,
+          "영업이익",
+          "operatingProfitChart"
+        );
+
+
+        drawProfitChart(
+          result.data,
+          "당기순이익",
+          "netIncomeChart"
+        );
+
+
+        loading.style.display = "none";
+
+
+      } catch (err) {
+
+        loading.style.display = "none";
+
+        error.textContent =
+          "데이터를 불러오는 중 문제가 발생했습니다. " +
+          err.message;
+
+        error.style.display = "block";
+
+      }
+
+    }
+
+
+    /*
+     * 영업이익 / 당기순이익 그래프를 그립니다.
+     */
+    function drawProfitChart(data, fieldName, chartId) {
+
+      const chart = document.getElementById(chartId);
+
+      chart.innerHTML = "";
+
+
+      if (!data || data.length === 0) {
+
+        chart.innerHTML =
+          '<div class="empty-message">저장된 실적이 없습니다.</div>';
+
+        return;
+
+      }
+
+
+      /*
+       * 가장 큰 양수값을 찾습니다.
+       */
+      const positiveValues = data
+        .map(item => Number(item[fieldName]) || 0)
+        .filter(value => value > 0);
+
+
+      /*
+       * 가장 큰 음수값의 절댓값을 찾습니다.
+       */
+      const negativeValues = data
+        .map(item => Number(item[fieldName]) || 0)
+        .filter(value => value < 0)
+        .map(value => Math.abs(value));
+
+
+      const maxPositive =
+        positiveValues.length > 0
+          ? Math.max(...positiveValues)
+          : 0;
+
+
+      const maxNegative =
+        negativeValues.length > 0
+          ? Math.max(...negativeValues)
+          : 0;
+
+
+      /*
+       * 그래프의 기준값입니다.
+       *
+       * 흑자만 있으면 최대값을 기준으로 하고,
+       * 적자가 있으면 흑자/적자를 모두 고려합니다.
+       */
+      const maxAbs =
+        Math.max(maxPositive, maxNegative, 1);
+
+
+      /*
+       * 0 기준선을 먼저 만듭니다.
+       */
+      const zeroLine = document.createElement("div");
+
+      zeroLine.className = "zero-line";
+
+      chart.appendChild(zeroLine);
+
+
+      data.forEach(function(item) {
+
+        const value =
+          Number(item[fieldName]) || 0;
+
+
+        const barItem =
+          document.createElement("div");
+
+        barItem.className = "bar-item profit-bar-item";
+
+
+        /*
+         * 흑자와 적자를 구분합니다.
+         */
+        const isNegative = value < 0;
+
+
+        /*
+         * 막대 높이 계산
+         */
+        const height =
+          Math.abs(value) / maxAbs * 45;
+
+
+        const barClass =
+          isNegative
+            ? "bar negative"
+            : "bar";
+
+
+        barItem.innerHTML = `
+
+          <div class="bar-value">
+            ${formatNumber(value)}
+          </div>
+
+          <div
+            class="${barClass}"
+            style="height: ${height}%;">
+          </div>
+
+          <div class="company">
+            ${escapeHtml(item["회사"])}
+          </div>
+
+        `;
+
+
+        chart.appendChild(barItem);
+
+      });
+
+    }
+
+
+    /*
+     * 숫자 표시
+     */
+    function formatNumber(value) {
+
+      return value.toLocaleString("ko-KR", {
+        maximumFractionDigits: 2
+      });
+
+    }
+
+
+    /*
+     * 회사명을 안전하게 표시
+     */
+    function escapeHtml(value) {
+
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    /*
+     * 나중에 저장 기능을 추가할 때 사용할 함수입니다.
+     *
+     * Content-Type은 text/plain으로 보냅니다.
+     */
+    async function saveData(company, sales, operatingProfit, netIncome) {
+
+      const data = {
+        "회사": company,
+        "매출액": sales,
+        "영업이익": operatingProfit,
+        "당기순이익": netIncome
+      };
+
+
+      const response = await fetch(API_URL, {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "text/plain"
+        },
+
+        body: JSON.stringify(data)
+
+      });
+
+
+      return await response.json();
+
+    }
+
+  </script>
 
 </body>
 </html>
