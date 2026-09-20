@@ -20,7 +20,7 @@ body {
 
 
 /* =========================
-   상단 헤더
+   상단
 ========================= */
 
 .header {
@@ -50,6 +50,7 @@ body {
   margin: 0;
 
   color: #8b837a;
+
   font-size: 14px;
 }
 
@@ -60,6 +61,7 @@ body {
 
 .month-select {
   display: flex;
+
   align-items: center;
 
   gap: 12px;
@@ -68,6 +70,7 @@ body {
 
 .month-select label {
   color: #8b837a;
+
   font-size: 13px;
 }
 
@@ -76,6 +79,7 @@ body {
   padding: 10px 34px 10px 14px;
 
   border: 1px solid #ddd5ca;
+
   border-radius: 9px;
 
   background: white;
@@ -113,6 +117,7 @@ body {
   border-radius: 9px 9px 0 0;
 
   font-size: 14px;
+
   font-weight: 600;
 }
 
@@ -146,6 +151,7 @@ body {
   display: flex;
 
   justify-content: space-between;
+
   align-items: end;
 
   margin-bottom: 22px;
@@ -160,6 +166,7 @@ body {
   color: #a08d78;
 
   font-size: 13px;
+
   font-weight: 600;
 }
 
@@ -181,7 +188,7 @@ body {
 
 
 /* =========================
-   안내 메시지
+   메시지
 ========================= */
 
 .message {
@@ -214,6 +221,7 @@ body {
   display: flex;
 
   justify-content: center;
+
   align-items: center;
 
   color: #9a9188;
@@ -223,7 +231,7 @@ body {
 
 
 /* =========================
-   그래프 카드
+   카드
 ========================= */
 
 .chart-card {
@@ -264,32 +272,54 @@ body {
 
 
 /* =========================
-   막대그래프
+   그래프 스크롤 영역
 ========================= */
 
+.chart-scroll {
+  width: 100%;
+
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+  padding-bottom: 12px;
+}
+
+
+/*
+ * 회사가 25개여도
+ * 각각 충분한 공간을 갖도록
+ * 그래프의 최소 너비를 설정합니다.
+ */
 .chart {
-  height: 330px;
+  position: relative;
+
+  height: 360px;
+
+  min-width: 1800px;
 
   display: flex;
 
   align-items: end;
 
-  justify-content: center;
+  justify-content: flex-start;
 
-  gap: 45px;
+  gap: 28px;
 
-  padding: 30px 30px 0;
-
-  overflow-x: auto;
+  padding: 30px 35px 0;
 
   border-bottom: 1px solid #ded7ce;
 }
 
 
-.bar-item {
-  width: 70px;
+/* =========================
+   막대
+========================= */
 
-  min-width: 70px;
+.bar-item {
+  width: 48px;
+
+  min-width: 48px;
 
   height: 100%;
 
@@ -306,7 +336,7 @@ body {
 
 
 .bar {
-  width: 52px;
+  width: 42px;
 
   min-height: 4px;
 
@@ -332,7 +362,7 @@ body {
 
   color: #665a4e;
 
-  font-size: 13px;
+  font-size: 12px;
 
   font-weight: 600;
 
@@ -345,7 +375,7 @@ body {
 
   color: #625a53;
 
-  font-size: 13px;
+  font-size: 12px;
 
   font-weight: 600;
 
@@ -357,36 +387,63 @@ body {
    이익 그래프
 ========================= */
 
+.profit-chart {
+  align-items: center;
+
+  padding-top: 0;
+
+  padding-bottom: 0;
+}
+
+
 .profit-bar-item {
   justify-content: center;
-
-  padding-top: 25px;
-  padding-bottom: 25px;
 }
 
 
-.profit-bar-item .bar-value {
-  position: absolute;
-
-  top: 50%;
-
-  transform: translateY(-100%);
-}
-
-
-.profit-bar-item .bar {
+/*
+ * 0선 위쪽의 막대
+ */
+.profit-bar-item .bar:not(.negative) {
   position: absolute;
 
   bottom: 50%;
 }
 
 
+/*
+ * 양수 금액
+ */
+.positive-value {
+  position: absolute;
+
+  bottom: calc(50% + 10px);
+}
+
+
+/*
+ * 음수 막대
+ */
 .profit-bar-item .bar.negative {
+  position: absolute;
+
   top: 50%;
 
   bottom: auto;
 
   border-radius: 0 0 7px 7px;
+}
+
+
+/*
+ * 음수 금액
+ */
+.negative-value {
+  position: absolute;
+
+  top: calc(50% + 10px);
+
+  margin: 0;
 }
 
 
@@ -397,14 +454,45 @@ body {
 .zero-line {
   position: absolute;
 
-  left: 30px;
-  right: 30px;
+  left: 35px;
+
+  right: 35px;
 
   top: 50%;
 
   border-top: 1px solid #cfc6bb;
 
   pointer-events: none;
+
+  z-index: 0;
+}
+
+
+/* =========================
+   스크롤바
+========================= */
+
+.chart-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+
+.chart-scroll::-webkit-scrollbar-track {
+  background: #eee9e1;
+
+  border-radius: 10px;
+}
+
+
+.chart-scroll::-webkit-scrollbar-thumb {
+  background: #c9bbaa;
+
+  border-radius: 10px;
+}
+
+
+.chart-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b5a28f;
 }
 
 
@@ -450,19 +538,23 @@ body {
 
 
   .chart {
-    justify-content: flex-start;
+    min-width: 1800px;
 
-    gap: 35px;
+    gap: 24px;
 
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 25px;
+
+    padding-right: 25px;
   }
 
 
   .bar-item {
-    flex: 0 0 70px;
+    width: 46px;
+
+    min-width: 46px;
   }
 
 }
 ```
+
 
