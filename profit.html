@@ -62,12 +62,10 @@
     <section class="chart-card">
 
       <div class="chart-header">
-
         <div>
           <h3>영업이익</h3>
           <p>회사별 영업이익을 비교해보세요.</p>
         </div>
-
       </div>
 
 
@@ -86,12 +84,10 @@
     <section class="chart-card">
 
       <div class="chart-header">
-
         <div>
           <h3>당기순이익</h3>
           <p>회사별 당기순이익을 비교해보세요.</p>
         </div>
-
       </div>
 
 
@@ -114,6 +110,7 @@
 
 
     /*
+     * Google Sheets의 금액은 원 단위입니다.
      * 1억원 = 100,000,000원
      */
     const WON_PER_EOK = 100000000;
@@ -122,6 +119,9 @@
     loadData();
 
 
+    /*
+     * Google Sheets에서 데이터를 가져옵니다.
+     */
     async function loadData() {
 
       const loading =
@@ -187,6 +187,9 @@
     }
 
 
+    /*
+     * 영업이익 / 당기순이익 그래프를 그립니다.
+     */
     function drawProfitChart(
       data,
       fieldName,
@@ -210,7 +213,7 @@
 
 
       /*
-       * 원 → 억원 변환
+       * 원 → 억원으로 변환
        */
       const convertedData = data.map(item => {
 
@@ -225,7 +228,7 @@
 
 
       /*
-       * 가장 큰 값과 가장 작은 값을 찾습니다.
+       * 가장 큰 양수 / 음수의 절댓값을 찾습니다.
        */
       const maxValue = Math.max(
         ...convertedData.map(item => item.value)
@@ -237,9 +240,6 @@
       );
 
 
-      /*
-       * 그래프의 최대 절대값을 기준으로 합니다.
-       */
       const maxAbs =
         Math.max(
           Math.abs(maxValue),
@@ -249,7 +249,7 @@
 
 
       /*
-       * 가운데 0 기준선
+       * 0 기준선
        */
       const zeroLine =
         document.createElement("div");
@@ -259,6 +259,9 @@
       chart.appendChild(zeroLine);
 
 
+      /*
+       * 회사별 막대 생성
+       */
       convertedData.forEach(function(item) {
 
         const value = item.value;
@@ -273,6 +276,8 @@
 
         /*
          * 막대 높이
+         *
+         * 최대값을 그래프 높이의 42% 정도로 표시합니다.
          */
         const height =
           Math.abs(value) /
@@ -280,90 +285,140 @@
           42;
 
 
-        const barClass =
-          value < 0
-            ? "bar negative"
-            : "bar";
+        /*
+         * 회사명
+         */
+        const company =
+          document.createElement("div");
+
+        company.className = "company";
+
+        company.textContent =
+          item.company;
 
 
         /*
-         * 양수는 0선 위,
-         * 음수는 0선 아래
+         * 숫자
+         */
+        const valueLabel =
+          document.createElement("div");
+
+        valueLabel.className =
+          "bar-value";
+
+
+        valueLabel.textContent =
+          formatNumber(value);
+
+
+        /*
+         * 막대
+         */
+        const bar =
+          document.createElement("div");
+
+        bar.className = "bar";
+
+
+        /*
+         * CSS에서 막대 높이를 계산할 수 있도록
+         * --bar-height라는 값을 전달합니다.
+         */
+        barItem.style.setProperty(
+          "--bar-height",
+          height + "%"
+        );
+
+
+        bar.style.height =
+          height + "%";
+
+
+        /*
+         * 양수
+         *
+         * 숫자 → 막대 → 0 기준선
          */
         if (value >= 0) {
 
-          barItem.innerHTML = `
+          bar.classList.add("positive");
 
-            <div class="bar-value positive-value">
-              ${formatNumber(value)}
-            </div>
+          valueLabel.classList.add(
+            "positive-value"
+          );
 
-            <div
-              class="${barClass}"
-              style="height: ${height}%;">
-            </div>
 
-            <div class="company">
-              ${escapeHtml(item.company)}
-            </div>
+          barItem.appendChild(
+            valueLabel
+          );
 
-          `;
-
-        } else {
-
-          barItem.innerHTML = `
-
-            <div class="bar negative"
-              style="height: ${height}%;">
-            </div>
-
-            <div class="bar-value negative-value">
-              ${formatNumber(value)}
-            </div>
-
-            <div class="company">
-              ${escapeHtml(item.company)}
-            </div>
-
-          `;
+          barItem.appendChild(
+            bar
+          );
 
         }
 
 
-        chart.appendChild(barItem);
+        /*
+         * 음수
+         *
+         * 0 기준선 → 막대 → 숫자
+         */
+        else {
+
+          bar.classList.add("negative");
+
+          valueLabel.classList.add(
+            "negative-value"
+          );
+
+
+          barItem.appendChild(
+            bar
+          );
+
+          barItem.appendChild(
+            valueLabel
+          );
+
+        }
+
+
+        barItem.appendChild(
+          company
+        );
+
+
+        chart.appendChild(
+          barItem
+        );
 
       });
-
-    }
-
-
-    function formatNumber(value) {
-
-      return value.toLocaleString("ko-KR", {
-        maximumFractionDigits: 1
-      });
-
-    }
-
-
-    function escapeHtml(value) {
-
-      if (value === null || value === undefined) {
-        return "";
-      }
-
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
 
     }
 
 
     /*
-     * 나중에 저장 기능에서 사용할 함수
+     * 숫자를 보기 좋게 표시합니다.
+     *
+     * 예:
+     * 1250 → 1,250
+     * -70 → -70
+     */
+    function formatNumber(value) {
+
+      return value.toLocaleString(
+        "ko-KR",
+        {
+          maximumFractionDigits: 1
+        }
+      );
+
+    }
+
+
+    /*
+     * 나중에 저장 기능을 추가할 때 사용할 함수입니다.
      */
     async function saveData(
       company,
@@ -373,10 +428,15 @@
     ) {
 
       const data = {
+
         "회사": company,
+
         "매출액": sales,
+
         "영업이익": operatingProfit,
+
         "당기순이익": netIncome
+
       };
 
 
@@ -395,6 +455,7 @@
 
 
       return await response.json();
+
     }
 
   </script>
@@ -402,3 +463,4 @@
 </body>
 </html>
 ```
+
