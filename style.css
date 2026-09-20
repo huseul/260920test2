@@ -1,0 +1,292 @@
+```css
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f7f4ef;
+  color: #3d3935;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans KR",
+    sans-serif;
+}
+
+
+/* =========================
+   상단 헤더
+========================= */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 34px 48px;
+
+  background: #fffdf9;
+  border-bottom: 1px solid #ebe5dc;
+}
+
+.header h1 {
+  margin: 0 0 7px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.header p {
+  margin: 0;
+  color: #8b837a;
+  font-size: 14px;
+}
+
+
+/* =========================
+   월 선택
+========================= */
+
+.month-select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.month-select label {
+  font-size: 13px;
+  color: #8b837a;
+}
+
+.month-select select {
+  padding: 10px 34px 10px 14px;
+
+  border: 1px solid #ddd5ca;
+  border-radius: 9px;
+
+  background: white;
+  color: #403b36;
+
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
+/* =========================
+   메뉴
+========================= */
+
+.nav {
+  display: flex;
+  gap: 8px;
+
+  padding: 18px 48px 0;
+
+  background: #fffdf9;
+}
+
+.nav a {
+  padding: 11px 22px;
+
+  color: #918980;
+  text-decoration: none;
+
+  border-radius: 9px 9px 0 0;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.nav a:hover {
+  background: #f5f1eb;
+}
+
+.nav a.active {
+  background: #f7f4ef;
+  color: #6f6255;
+}
+
+
+/* =========================
+   본문
+========================= */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 42px 48px 70px;
+}
+
+.page-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 7px;
+
+  color: #a08d78;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.page-title h2 {
+  margin: 0;
+
+  font-size: 25px;
+  letter-spacing: -0.7px;
+}
+
+.unit {
+  color: #9a9188;
+  font-size: 13px;
+}
+
+
+/* =========================
+   그래프 카드
+========================= */
+
+.chart-card {
+  margin-bottom: 28px;
+  padding: 28px 30px 32px;
+
+  background: #fffdf9;
+
+  border: 1px solid #ebe5dc;
+  border-radius: 16px;
+
+  box-shadow: 0 3px 14px rgba(80, 65, 50, 0.04);
+}
+
+.chart-header {
+  margin-bottom: 28px;
+}
+
+.chart-header h3 {
+  margin: 0 0 6px;
+
+  font-size: 17px;
+}
+
+.chart-header p {
+  margin: 0;
+
+  color: #9a9188;
+  font-size: 13px;
+}
+
+
+/* =========================
+   막대그래프
+========================= */
+
+.chart {
+  height: 330px;
+
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 80px;
+
+  padding: 30px 40px 0;
+
+  border-bottom: 1px solid #ded7ce;
+}
+
+.bar-item {
+  width: 100px;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+
+  position: relative;
+}
+
+.bar {
+  width: 62px;
+
+  min-height: 4px;
+
+  background: #b79b7a;
+
+  border-radius: 8px 8px 0 0;
+
+  transition: transform 0.2s ease;
+}
+
+.bar:hover {
+  transform: translateY(-4px);
+}
+
+.bar-value {
+  margin-bottom: 8px;
+
+  color: #665a4e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.company {
+  margin-top: 12px;
+
+  color: #625a53;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =========================
+   작은 화면
+========================= */
+
+@media (max-width: 700px) {
+
+  .header {
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .nav {
+    padding-left: 24px;
+  }
+
+  .container {
+    padding: 30px 20px 50px;
+  }
+
+  .page-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .chart-card {
+    padding: 22px 16px 26px;
+  }
+
+  .chart {
+    justify-content: flex-start;
+    gap: 35px;
+    overflow-x: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .bar-item {
+    flex: 0 0 80px;
+  }
+
+}
+```

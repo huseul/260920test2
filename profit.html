@@ -1,0 +1,121 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>연결재무실적 - 이익</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="header">
+    <div>
+      <h1>연결재무실적</h1>
+      <p>회사별 월간 실적을 한눈에 확인하세요.</p>
+    </div>
+
+    <div class="month-select">
+      <label for="month">실적월</label>
+      <select id="month">
+        <option>2026년 7월</option>
+        <option>2026년 8월</option>
+        <option>2026년 9월</option>
+      </select>
+    </div>
+  </header>
+
+
+  <nav class="nav">
+    <a href="index.html">매출액</a>
+    <a href="profit.html" class="active">이익</a>
+  </nav>
+
+
+  <main class="container">
+
+    <section class="page-title">
+      <div>
+        <span class="eyebrow">2026년 7월</span>
+        <h2>회사별 이익</h2>
+      </div>
+
+      <span class="unit">단위 : 억원</span>
+    </section>
+
+
+    <section class="chart-card">
+
+      <div class="chart-header">
+        <div>
+          <h3>영업이익</h3>
+          <p>회사별 영업이익을 비교해보세요.</p>
+        </div>
+      </div>
+
+
+      <div class="chart">
+
+        <div class="bar-item">
+          <div class="bar-value">120</div>
+          <div class="bar" style="height: 100%;"></div>
+          <div class="company">A사</div>
+        </div>
+
+        <div class="bar-item">
+          <div class="bar-value">85</div>
+          <div class="bar" style="height: 71%;"></div>
+          <div class="company">B사</div>
+        </div>
+
+        <div class="bar-item">
+          <div class="bar-value">52</div>
+          <div class="bar" style="height: 43%;"></div>
+          <div class="company">C사</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="chart-card">
+
+      <div class="chart-header">
+        <div>
+          <h3>당기순이익</h3>
+          <p>회사별 당기순이익을 비교해보세요.</p>
+        </div>
+      </div>
+
+
+      <div class="chart">
+
+        <div class="bar-item">
+          <div class="bar-value">95</div>
+          <div class="bar" style="height: 100%;"></div>
+          <div class="company">A사</div>
+        </div>
+
+        <div class="bar-item">
+          <div class="bar-value">62</div>
+          <div class="bar" style="height: 65%;"></div>
+          <div class="company">B사</div>
+        </div>
+
+        <div class="bar-item">
+          <div class="bar-value">38</div>
+          <div class="bar" style="height: 40%;"></div>
+          <div class="company">C사</div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+</html>
+```
